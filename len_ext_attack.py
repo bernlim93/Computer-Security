@@ -23,6 +23,7 @@ killatoken = h.hexdigest()
 
 
 killaurl = url.split('=')[0] + "=" + killatoken + "&" + message + urllib.quote(padding(m_len*8)) + killamessage
+print killaurl
 parsedUrl = urlparse.urlparse(killaurl)
 conn = httplib.HTTPConnection(parsedUrl.hostname)
 conn.request("GET", parsedUrl.path + "?" + parsedUrl.query)
