@@ -1,3 +1,5 @@
-""""""
+
+"""
 from hashlib import sha256
+print blob
 print sha256(blob).hexdigest()
