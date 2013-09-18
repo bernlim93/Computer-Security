@@ -1,0 +1,7 @@
+1. 
+If you used an HMAC construction, the only way to generate the correct token would require the hacker to know the user's password, since HMAC uses a special key (the user's password) to generate the token.
+
+The reason a length-extension attack works is because your hash is H(password||message) and the hacker already knows H(password) and the length of the message which is all the information necessary to append a malicious attack. HMAC requires different information to generate the proper token.
+
+2.
+Since collisions exist in MD5, an attacker could generate a malicious program that matches that of a digital signature of a valid and trusted program.
