@@ -1,0 +1,6 @@
+/Times-Roman findfont
+12 scalefont
+setfont
+newpath
+100 200 moveto
+(tingcten guesses ) print 3
