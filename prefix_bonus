@@ -1,0 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+message = "this should make the same hash"
+h = md5(m)
+print h.hexdigest()
+blob = """
