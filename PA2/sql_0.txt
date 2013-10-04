@@ -1,0 +1,1 @@
+username=victim&password=blah%27%20%7C%7C%201%3D1%3B%23
