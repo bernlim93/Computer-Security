@@ -1,7 +1,7 @@
- """
+  """
 from pymd5 import md5
 message = "this should make the same hash"
-h = md5(m)
+h = md5(message)
 print h.hexdigest()
 h.update(blob)
 print h.hexdigest()
