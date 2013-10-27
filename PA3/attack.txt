@@ -1,0 +1,6 @@
+1) 13:37:7C:8A:6B
+2) un5ueSSab1e
+3) Using Kali Linux, we were able to obtain the tools necessary for cracking the WEP key and perform ARP spoofing.
+In order to crack the WEP key, we used kismet to obtain the MAC address of the router and the channel of the wireless network. After obtaining the information, we our wireless adapter into monitoring mode and faked the MAC address. Then using airodump-ng we logged as many initialization vectors into a log file. To boost the amount of data we recieved, we used airplay-ng to start an ARP injection attack. After generating close to 3000 data packets, we used aircrack-ng to crack the WEP key. Reference: http://kemovitra.blogspot.com/2013/03/hacking-and-cracking-wep-with-kali-linux.html
+
+To perform ARP spoof, we flipped our machine into ip_forward mode. We then added a rule to intercept all 443 traffic (HTTPS port) to our machine. We then used arpspoof to spoof our machine to look like the gateway. Finally we used sslsniff and provided the user with a fake certificate while recieving the correct certificate from the router.
