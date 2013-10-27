@@ -13,41 +13,38 @@ suspicious = []
 for ts, buf in pcap:
 	try: 
 		eth = dpkt.ethernet.Ethernet(buf)
-		ip = eth.data
-		if (type(ip.data) == dpkt.tcp.TCP):
-			tcp = ip.data
-			ipaddr = str(socket.inet_ntoa(ip.src))
+		if eth:
 
-			ack_flag = tcp.flags & dpkt.tcp.TH_ACK
-			syn_flag = tcp.flags & dpkt.tcp.TH_SYN
+			ip = eth.data
+			if (type(ip.data) == dpkt.tcp.TCP):
+				tcp = ip.data
+				ipaddr = socket.inet_ntoa(ip.src)
+				dest = socket.inet_ntoa(ip.dst)
 
-			# SYN
-			if (syn_flag and ack_flag <= 0):
-				if (syndict.has_key(ipaddr)):
-					syndict[ipaddr] += 1
-				
-				else:
-					syndict[ipaddr] = 1
+				ack_flag = tcp.flags & dpkt.tcp.TH_ACK
+				syn_flag = tcp.flags & dpkt.tcp.TH_SYN
 
-			#SYN-ACK
-			if (syn_flag and ack_flag):
-				if (synackdict.has_key(ipaddr)):
-					synackdict[ipaddr] += 1
-				
-				else:
-					synackdict[ipaddr] = 1
+				# SYN
+				if (syn_flag and ack_flag == 0):
+					if (syndict.has_key(ipaddr)):
+						syndict[ipaddr] += 1
+					else:
+						syndict[ipaddr] = 1
+
+				#SYN-ACK
+				if (syn_flag and ack_flag):
+					if (synackdict.has_key(dest)):
+						synackdict[dest] += 1
+					else:
+						synackdict[dest] = 1
+
 
 	except:
 		#IGNORE MALFORMED DATA
 		continue
 
-
-
-print syndict
-print synackdict
-
 for key in syndict:
-		if (not synackdict.has_key(key) or (syndict[key] > (synackdict[key] * 3))):
+		if ((not synackdict.has_key(key)) or (syndict[key] > (synackdict[key] * 3))):
 			print key
 
 
