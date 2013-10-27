@@ -2,14 +2,14 @@ Part 1
 
 1) 	04:0c:ce:d8:0f:fa, 10.0.2.2
 	8c:a9:82:50:f0:a6, 10.0.2.3
-	00:26:08:e5:66:07, 10.0.2.1
+	00:26:08:e5:66:07, 10.0.2.1 (router)
 2) This appears to be a local area without too much traffic. By examining the end points, it appears the traffic is mostly random browsing.
 3) 	a) dl.xs4all.nl
 	b) Active FTP
 	c) The user IDs and passwords are carried over a cleartext connection. Using Wireshark, an attacker can easily see the username and password of the client trying to make a connection.
 	d) SSH and FTP over SSH
 4)	a) ctools.umich.edu
-	b) No, the client still needs to perform a TLS handshake with the server
+	b) No, HTTPS can hide the domain name during the connection, however it cannot hide the DNS request.
 	c) 	Cipher Suite: TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA (0xc00a)
 		Cipher Suite: TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA (0xc014)
 		Cipher Suite: TLS_DHE_RSA_WITH_CAMELLIA_256_CBC_SHA (0x0088)
@@ -46,16 +46,17 @@ Part 1
 		Cipher Suite: TLS_ECDH_ECDSA_WITH_3DES_EDE_CBC_SHA (0xc003)
 		Cipher Suite: SSL_RSA_FIPS_WITH_3DES_EDE_CBC_SHA (0xfeff)
 		Cipher Suite: TLS_RSA_WITH_3DES_EDE_CBC_SHA (0x000a)
-	d) Yes, there is an MD5 encryption which is known to be extremely insecure.
+	d) Yes, the suite includes MD5 encryption which is known to be extremely insecure. Also many of the encryptions use 128 bit encryption which has been known now to be very insecure; today's standard is 256 bit encryption.
 	e) Cipher Suite: TLS_RSA_WITH_RC4_128_MD5 (0x0004)
-5)	a) 
-	b)
-	c))
+5)	a) Only the login is done through HTTPS, all other requests are HTTP. 
+    b) Since the other requests are done through HTTP, you can grab the cookies from the HTTP request the client sends and impersonate them.
+    c) There are facebook settings that allow the users to send requests through HTTPS.
+    d) 
 
 Part 2
-1) 
-2) 
-3) We both have Windows and only one of our machinrs has a compatible wireless car for aircrack. We decided to download backtrack 5 and run it on virtual box. 
+1) 13:37:7C:8A:6B
+2) un5ueSSab1e
+3) Using Kali Linux, we were able to obtain the tools necessary for cracking the WEP key and perform ARP spoofing.
+In order to crack the WEP key, we used kismet to obtain the MAC address of the router and the channel of the wireless network. After obtaining the information, we our wireless adapter into monitoring mode and faked the MAC address. Then using airodump-ng we logged as many initialization vectors into a log file. To boost the amount of data we recieved, we used airplay-ng to start an ARP injection attack. After generating close to 3000 data packets, we used aircrack-ng to crack the WEP key. Reference: http://kemovitra.blogspot.com/2013/03/hacking-and-cracking-wep-with-kali-linux.html
 
-http://askubuntu.com/questions/142007/cant-install-aircrack-ng
-
+To perform ARP spoof, we flipped our machine into ip_forward mode. We then added a rule to intercept all 443 traffic (HTTPS port) to our machine. We then used arpspoof to spoof our machine to look like the gateway. Finally we used sslsniff and provided the user with a fake certificate while recieving the correct certificate from the router.
